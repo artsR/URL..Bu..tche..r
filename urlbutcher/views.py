@@ -93,7 +93,7 @@ def create_funny_slug(request):
             request, 'Short link generated successfully. Copy and enjoy using it.'
         )
         messages.info(request, 'Your link can be used for at least 7 days.')
-        messages.info(request, f'Your slug: {new_slug}', extra_tags='dark')
+        messages.info(request, f'Your slug: {new_slug}')
 
         return redirect('home')
 
@@ -111,7 +111,7 @@ def create_chuck_norris_slug(request):
 
     if form.is_valid():
         new_url = form.cleaned_data.get('url')
-        slug_fact = get_chuck_norris_fact(CHUCK_FACT_LEN_THRESHOLD);print(slug_fact)
+        slug_fact = get_chuck_norris_fact(CHUCK_FACT_LEN_THRESHOLD)
         new_slug = Url.get_unique_slug(
             ALPHABET, k=3, custom_slug=f'{slug_fact}', sep='__'
         )
@@ -126,7 +126,7 @@ def create_chuck_norris_slug(request):
             request, 'Short link generated successfully. Copy and enjoy using it.'
         )
         messages.info(request, 'Your link can be used for at least 7 days.')
-        messages.info(request, f'Your slug: {new_slug}', extra_tags='dark')
+        messages.info(request, f'Your slug: {new_slug}')
 
         return redirect('home')
 
