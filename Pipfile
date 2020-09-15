@@ -7,6 +7,9 @@ verify_ssl = true
 
 [packages]
 django = "*"
+django-widget-tweaks = "*"
+requests = "*"
+python-dotenv = "*"
 
 [requires]
 python_version = "3.8"
