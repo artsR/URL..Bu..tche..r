@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 import os
 
 from pathlib import Path
+from django.contrib.messages import constants as msg_constants
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -127,3 +128,12 @@ STATICFILES_DIRS = os.path.join(BASE_DIR, 'static'),
 
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
+
+
+MESSAGE_TAGS = {
+    msg_constants.DEBUG: 'alert-light',
+    msg_constants.INFO: 'alert-info',
+    msg_constants.SUCCESS: 'alert-success',
+    msg_constants.WARNING: 'alert-warning',
+    msg_constants.ERROR: 'alert-danger',
+}
