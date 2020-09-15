@@ -1,1 +1,53 @@
-<h1>Let <b>Butcher</b> do his work!!</h1>
+{% extends 'base.html' %}
+
+{% load widget_tweaks %}
+
+{% block content %}
+<div class="card border-0 mx-auto col-xl-10">
+  <div class="card-body">
+    <form class="row g-3 align-items-center was-validated" method="post">
+      {% csrf_token %}
+      {% if form.slug.value == None or form.is_bound %}
+        {% for field in form.visible_fields %}
+          <div class="mb-3">
+          {% if field.errors %}
+            {% render_field field class="form-control form-control-lg is-invalid" %}
+            {% for err in field.errors %}
+            <div class="invalid-feedback">
+              {{ err }}
+            </div>
+            {% endfor %}
+          {% else %}
+            {% render_field field class="form-control form-control-lg" %}
+          {% endif %}
+          </div>
+        {% endfor %}
+        <div class="col-md-4">
+          <input type="submit" class="btn btn-primary btn-block" formaction="{%url 'create_short_slug' %}" value="Shorten"/>
+        </div>
+        <div class="col-md-4">
+          <input type="submit" class="btn btn-dark btn-block" formaction="{%url 'create_funny_slug' %}" value="Get Funny Link"/>
+        </div>
+        <div class="col-md-4">
+          <input type="submit" class="btn btn-dark btn-block" formaction="{%url 'create_chuck_slug' %}" value="Get Chuck Link"/>
+        </div>
+      {% else %}
+        <div class="mb-3">
+          {% render_field form.slug class="form-control form-control-lg" %}
+          {{ form.slug.errors }}
+        </div>
+        <div class="col-md-4">
+          <input type="button" class="btn btn-primary btn-block" id="copy-slug" value="Copy"/>
+        </div>
+        <div class="mb-3">
+          <small>
+            <a class="form-text text-muted" href="{%url 'home' %}">
+              Shorten another link
+            </a>
+          </small>
+        </div>
+      {% endif %}
+    </form>
+  </div>
+</div>
+{% endblock content %}

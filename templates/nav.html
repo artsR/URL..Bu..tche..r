@@ -1,0 +1,16 @@
+<nav class="navbar sticky-top navbar-dark navbar-expand-md mb-2 bg-secondary bg-gradient shadow-sm">
+  <div class="container-md text-white-50 justify-content-between">
+    <a class="navbar-brand" href="{% url 'home' %}">URL.Bu..tcher</a>
+    {% if request.user.is_authenticated %}
+    <span>
+      <span class="btn btn-outline-warning border-0">Dashboard</span>
+      <a class="btn btn-outline-light border-0" href="{% url 'logout' %}">Sign Out</a>
+    </span>
+    {% else %}
+    <span>
+      <a class="btn btn-outline-light border-0" href="{% url 'login' %}">Sign In</a>
+      <a class="ml-1 btn btn-outline-light border-0" href="{% url 'register' %}">Sign Up</a>
+    </span>
+    {% endif %}
+  </div>
+</nav>

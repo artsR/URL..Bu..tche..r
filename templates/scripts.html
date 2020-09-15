@@ -1,0 +1,17 @@
+<script type="text/javascript">
+
+// Copy generated `slug` to clipboard:
+const copyBtn = document.querySelector('#copy-slug')
+if (copyBtn) {
+  copyBtn.addEventListener('click', () => {
+    navigator.permissions.query({name: "clipboard-write"}).then(result => {
+      if (result.state == "granted" || result.state == "prompt") {
+        navigator.clipboard.writeText(
+          document.querySelector('#{{form.slug.auto_id}}').value
+        )
+      }
+    })
+  })
+}
+
+</script>

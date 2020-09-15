@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    {% include 'meta.html' %}
+    <title>URL.Bu..tcher</title>
+  </head>
+  <body>
+    {% include 'nav.html' %}
+    <div class="container-md mb-5 px-0 shadow">
+      <div class="mb-5 p-5 bg-light text-center">
+        <h1 class="display-4">Let <b>URL.Bu..tcher</b> do his work!</h1>
+        <p class="lead">A URL shortener to help you share links with your friends.</p>
+        <hr class="my-4">
+      </div>
+    </div>
+    <div class="container-md mb-5">{% include 'alert.html' %}</div>
+    <div class="container-md mb-5 px-0 p-5 shadow">
+      {% block content %}{% endblock content %}
+    </div>
+    {% include 'scripts.html' %}
+  </body>
+</html>
