@@ -41,16 +41,17 @@ class SlugPagesTest(SimpleTestCase):
 
 class AccountsPagesTest(SimpleTestCase):
     def test_accounts_login_page_status_code(self):
-        response = self.client.get('/accounts/login/')
+        response = self.client.get(reverse('login'))
         self.assertEqual(response.status_code, 200)
 
     def test_accounts_register_page_status_code(self):
-        response = self.client.get('/accounts/register/')
+        response = self.client.get(reverse('register'))
         self.assertEqual(response.status_code, 200)
 
     def test_accounts_logout_page_status_code(self):
-        response = self.client.get('/accounts/logout/')
+        response = self.client.get(reverse('logout'))
         self.assertRedirects(response, '/', 302, 200)
+
 
 
 class UrlModelTests(TestCase):
