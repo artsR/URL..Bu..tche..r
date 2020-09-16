@@ -4,6 +4,7 @@ from datetime import timedelta
 
 from django.test import TestCase, SimpleTestCase
 from django.utils import timezone
+from django.urls import reverse
 
 from .models import Url, FunnyQuote, EXPIRES_IN
 
