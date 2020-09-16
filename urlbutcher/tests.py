@@ -63,7 +63,7 @@ class SlugPagesTest(TestCase):
         data = {'slug': self.unique_slug, 'url': self.valid_url}
         response = self.client.post(reverse('create_short_slug'), data)
         self.assertEqual(response.status_code, 302)
-        # Retrieve created object from db:
+        # Retrieve posted object from db:
         posted_slug = Url.objects.get(slug=self.unique_slug)
         self.assertEqual(posted_slug.url, self.valid_url)
 
@@ -75,7 +75,7 @@ class SlugPagesTest(TestCase):
         data = {'slug': self.expired_slug, 'url': self.valid_url}
         response = self.client.post(reverse('create_short_slug'), data)
         self.assertEqual(response.status_code, 302)
-        # Retrieve updated object:
+        # Retrieve posted object:
         posted_slug = Url.objects.get(slug=self.expired_slug)
         self.assertNotEqual(posted_slug.created_at, self.expired_date)
 
