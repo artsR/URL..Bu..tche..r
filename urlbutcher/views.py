@@ -41,31 +41,30 @@ def redirect_slug(request, slug_id):
 
 @require_http_methods(['POST'])
 def create_short_slug(request):
-    """Creates short `slug` for given URL using random."""
-    if request.method == 'POST':
+    """Creates short `slug` for given URL using random characters."""
+    form = UrlForm(request.POST)
 
-        form = UrlForm(request.POST)
-        if form.is_valid():
-            new_url = form.cleaned_data.get('url')
-            custom_slug = form.cleaned_data.get('slug')
+    if form.is_valid():
+        new_url = form.cleaned_data.get('url')
+        custom_slug = form.cleaned_data.get('slug')
 
-            new_slug = custom_slug if custom_slug else Url.get_unique_slug(ALPHABET)
+        new_slug = custom_slug if custom_slug else Url.get_unique_slug(ALPHABET)
 
-            Url.objects.update_or_create(
-                slug=new_slug,
-                defaults={'url': new_url, 'created_at': timezone.now()}
-            )
-            request.session['slug_id'] = new_slug
+        Url.objects.update_or_create(
+            slug=new_slug,
+            defaults={'url': new_url, 'created_at': timezone.now()}
+        )
+        request.session['slug_id'] = new_slug
 
-            messages.success(
-                request, 'Short link generated successfully. Copy and enjoy using it.'
-            )
-            messages.info(request, 'Your link can be used for at least 7 days.')
+        messages.success(
+            request, 'Short link generated successfully. Copy and enjoy using it.'
+        )
+        messages.info(request, 'Your link can be used for at least 7 days.')
 
-            return redirect('home')
+        return redirect('home')
 
-    context = dict(form=form)
     messages.error(request, 'Provided invalid data. Please try again')
+    context = dict(form=form)
 
     return render(request, 'home.html', context)
 
@@ -97,8 +96,8 @@ def create_funny_slug(request):
 
         return redirect('home')
 
-    context = dict(form=form)
     messages.error(request, 'Provided invalid data. Please try again')
+    context = dict(form=form)
 
     return render(request, 'home.html', context)
 
@@ -130,7 +129,7 @@ def create_chuck_norris_slug(request):
 
         return redirect('home')
 
-    context = dict(form=form)
     messages.error(request, 'Provided invalid data. Please try again')
+    context = dict(form=form)
 
     return render(request, 'home.html', context)
