@@ -25,6 +25,20 @@ class HomePagesTest(SimpleTestCase):
         response = self.client.get('/home/')
         self.assertEqual(response.status_code, 200)
 
+class SlugPagesTest(SimpleTestCase):
+    def test_slug_short_page_status_code_for_anonymous(self):
+        response = self.client.get(reverse('create_short_slug'))
+        self.assertEqual(response.status_code, 405)
+
+    def test_slug_funny_page_status_code_for_anonymous(self):
+        response = self.client.get(reverse('create_funny_slug'))
+        self.assertEqual(response.status_code, 405)
+
+    def test_slug_chuck_page_status_code_for_anonymous(self):
+        response = self.client.get(reverse('create_chuck_slug'))
+        self.assertEqual(response.status_code, 405)
+
+
 class AccountsPagesTest(SimpleTestCase):
     def test_accounts_login_page_status_code(self):
         response = self.client.get('/accounts/login/')
