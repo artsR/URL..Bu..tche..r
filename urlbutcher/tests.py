@@ -5,8 +5,10 @@ from datetime import timedelta
 from django.test import TestCase, SimpleTestCase
 from django.utils import timezone
 from django.urls import reverse
+from django.core.exceptions import ValidationError
 
 from .models import Url, FunnyQuote, EXPIRES_IN
+from .forms import UrlForm
 
 # Create your tests here.
 
@@ -54,7 +56,7 @@ class AccountsPagesTest(SimpleTestCase):
 
 
 
-class UrlModelTests(TestCase):
+class UrlModelTest(TestCase):
     def test_expired_with_old_slug(self):
         """Url.expired() returns True for entries
         that was created EXPIRES_IN days ago and more.
@@ -116,3 +118,32 @@ class UrlModelTests(TestCase):
         new_slug = Url.get_unique_slug(POPULATION, k=max_slug_len)
 
         self.assertEqual(new_slug, expired_entry.slug)
+
+
+class UrlFormTest(TestCase):
+    def setUp(self):
+        self.valid_url = 'http://www.example.pl'
+        self.empty_slug = ''
+        self.valid_slug = 'aBcD'
+
+    def test_clean_slug_for_empty(self):
+        """clean_slug() returns empty string for empty slug field in form."""
+        form = UrlForm(data={'url': self.valid_url, 'slug': self.empty_slug})
+        self.assertTrue(form.is_valid())
+        self.assertEqual(form.cleaned_data['slug'], '')
+
+    def test_clean_slug_for_unique_slug(self):
+        """clean_slug() returns the same value for unique slug field in form."""
+        form = UrlForm(data={'url': self.valid_url, 'slug': self.valid_slug})
+        self.assertTrue(form.is_valid())
+        self.assertEqual(form.cleaned_data['slug'], self.valid_slug)
+
+    def test_clean_slug_for_duplicate_slug(self):
+        """clean_slug() raise ValidationError for slug field value in form that
+        already exists in database.
+        """
+        create_db_entry(Url, url=self.valid_url, slug=self.valid_slug)
+        slug_already_in_db = self.valid_slug
+        form = UrlForm(data={'url':self.valid_url, 'slug': slug_already_in_db})
+        self.assertFalse(form.is_valid())
+        self.assertTrue(form.has_error('slug', code='already_used'))
