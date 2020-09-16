@@ -89,6 +89,13 @@ class SlugPagesTest(TestCase):
         posted_slug = Url.objects.get(slug=self.recent_slug)
         self.assertEqual(posted_slug.created_at, self.recent_date)
 
+    def test_create_short_slug_no_data(self):
+        n_entries_before_post = Url.objects.count()
+        response = self.client.post(reverse('create_short_slug'))
+        n_entries_after_post = Url.objects.count()
+        self.assertEqual(response.status_code, 200)
+        self.assertIs(n_entries_before_post, n_entries_after_post)
+
     def test_create_funny_slug_without_custom_slug(self):
         pass
 
