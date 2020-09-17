@@ -25,7 +25,7 @@ def home(request):
     if slug_id is None:
         form = UrlForm()
     else:
-        hostname = request.META
+        hostname = request.META['HTTP_HOST']
         form = UrlForm(initial={'slug': f'{hostname}/{slug_id}'})
 
     context = dict(form=form)
