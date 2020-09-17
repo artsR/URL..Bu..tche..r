@@ -28,7 +28,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY') or ')t0#scwjkclr$a3x8n!-jr07(mg+52#!w$
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['urlbutcher.herokuapp.com',  '127.0.0.1']
 
 
 # Application definition
