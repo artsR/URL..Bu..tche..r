@@ -37,9 +37,11 @@ class SlugPagesTest(TestCase):
         self.recent_slug = 'xYz'
         self.expired_date = timezone.now() + timedelta(days=-EXPIRES_IN)
         self.recent_date = timezone.now()
+        # Add entry with expired slug into db (can be overwritten):
         create_db_entry(
             Url, slug=self.expired_slug, url=self.valid_url, created_at=self.expired_date
         )
+        # Add entry with recent slug into db (cannot be overwritten):
         create_db_entry(
             Url, slug=self.recent_slug, url=self.valid_url, created_at=self.recent_date
         )
@@ -92,6 +94,20 @@ class SlugPagesTest(TestCase):
     def test_create_short_slug_no_data(self):
         n_entries_before_post = Url.objects.count()
         response = self.client.post(reverse('create_short_slug'))
+        n_entries_after_post = Url.objects.count()
+        self.assertEqual(response.status_code, 200)
+        self.assertIs(n_entries_before_post, n_entries_after_post)
+
+    def test_create_funny_slug_no_data(self):
+        n_entries_before_post = Url.objects.count()
+        response = self.client.post(reverse('create_funny_slug'))
+        n_entries_after_post = Url.objects.count()
+        self.assertEqual(response.status_code, 200)
+        self.assertIs(n_entries_before_post, n_entries_after_post)
+
+    def test_create_chuck_slug_no_data(self):
+        n_entries_before_post = Url.objects.count()
+        response = self.client.post(reverse('create_chuck_slug'))
         n_entries_after_post = Url.objects.count()
         self.assertEqual(response.status_code, 200)
         self.assertIs(n_entries_before_post, n_entries_after_post)
