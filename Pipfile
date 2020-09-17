@@ -11,6 +11,7 @@ django-widget-tweaks = "*"
 requests = "*"
 python-dotenv = "*"
 gunicorn = "*"
+whitenoise = "*"
 
 [requires]
 python_version = "3.8"
