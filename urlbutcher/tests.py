@@ -29,7 +29,21 @@ class HomePagesTest(SimpleTestCase):
         self.assertTemplateUsed(response, 'home.html')
 
 
-class SlugPagesTest(TestCase):
+class SlugPagesTest(SimpleTestCase):
+    def test_slug_short_page_status_code(self):
+        response = self.client.post(reverse('create_short_slug'))
+        self.assertEqual(response.status_code, 200)
+
+    def test_slug_funny_page_status_code(self):
+        response = self.client.post(reverse('create_funny_slug'))
+        self.assertEqual(response.status_code, 200)
+
+    def test_slug_chuck_page_status_code(self):
+        response = self.client.post(reverse('create_chuck_slug'))
+        self.assertEqual(response.status_code, 200)
+
+
+class ViewsTest(TestCase):
     def setUp(self):
         self.valid_url = 'http://www.example.pl/example-example/example'
         self.unique_slug = 'tEsT'
@@ -45,51 +59,7 @@ class SlugPagesTest(TestCase):
         create_db_entry(
             Url, slug=self.recent_slug, url=self.valid_url, created_at=self.recent_date
         )
-
-    def test_slug_short_page_status_code(self):
-        response = self.client.post(reverse('create_short_slug'))
-        self.assertEqual(response.status_code, 200)
-
-    def test_slug_funny_page_status_code(self):
-        response = self.client.post(reverse('create_funny_slug'))
-        self.assertEqual(response.status_code, 200)
-
-    def test_slug_chuck_page_status_code(self):
-        response = self.client.post(reverse('create_chuck_slug'))
-        self.assertEqual(response.status_code, 200)
-
-    def test_create_short_slug_with_custom_unique_slug(self):
-        """Creates entry in Url with short slug provided by user.
-        There is no conflict with slugs already created.
-        """
-        data = {'slug': self.unique_slug, 'url': self.valid_url}
-        response = self.client.post(reverse('create_short_slug'), data)
-        self.assertEqual(response.status_code, 302)
-        # Retrieve posted object from db:
-        posted_slug = Url.objects.get(slug=self.unique_slug)
-        self.assertEqual(posted_slug.url, self.valid_url)
-
-    def test_create_short_slug_with_custome_expired_slug(self):
-        """Creates entry in Url with short slug provided by user.
-        There is  conflict with slug already created but because of expiration
-        it will be overwritten.
-        """
-        data = {'slug': self.expired_slug, 'url': self.valid_url}
-        response = self.client.post(reverse('create_short_slug'), data)
-        self.assertEqual(response.status_code, 302)
-        # Retrieve posted object:
-        posted_slug = Url.objects.get(slug=self.expired_slug)
-        self.assertNotEqual(posted_slug.created_at, self.expired_date)
-
-    def test_create_short_slug_with_custom_duplicate_slug(self):
-        """Creates entry in Url with short slug provided by user.
-        There is conflict with slugs already created - entry will not be created.
-        """
-        data = {'slug': self.recent_slug, 'url': self.valid_url}
-        response = self.client.post(reverse('create_short_slug'), data)
-        self.assertEqual(response.status_code, 200)
-        posted_slug = Url.objects.get(slug=self.recent_slug)
-        self.assertEqual(posted_slug.created_at, self.recent_date)
+        create_db_entry(FunnyQuote, quote='SomeFunnyQuote')
 
     def test_create_short_slug_no_data(self):
         n_entries_before_post = Url.objects.count()
@@ -112,17 +82,82 @@ class SlugPagesTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIs(n_entries_before_post, n_entries_after_post)
 
-    def test_create_funny_slug_without_custom_slug(self):
-        pass
+    def test_create_short_slug_with_custom_unique_slug(self):
+        """Creates entry in Url with short slug provided by user.
+        There is no conflict with slugs already created.
+        """
+        data = {'slug': self.unique_slug, 'url': self.valid_url}
+        response = self.client.post(reverse('create_short_slug'), data)
+        self.assertEqual(response.status_code, 302)
+        # Retrieve posted object from db:
+        posted_slug = Url.objects.get(slug=self.unique_slug)
+        self.assertEqual(posted_slug.url, self.valid_url)
+
+    def test_create_short_slug_with_custome_expired_slug(self):
+        """Creates entry in Url with short slug provided by user and redirects to 'home'
+        There is  conflict with slug already created but because of expiration
+        it will be overwritten.
+        """
+        data = {'slug': self.expired_slug, 'url': self.valid_url}
+        response = self.client.post(reverse('create_short_slug'), data)
+        self.assertEqual(response.status_code, 302)
+        # Retrieve posted object:
+        posted_slug = Url.objects.get(slug=self.expired_slug)
+        self.assertNotEqual(posted_slug.created_at, self.expired_date)
+
+    def test_create_short_slug_with_custom_duplicate_slug(self):
+        """Creates entry in Url with short slug provided by user.
+        There is conflict with slugs already created - entry will not be created.
+        """
+        data = {'slug': self.recent_slug, 'url': self.valid_url}
+        response = self.client.post(reverse('create_short_slug'), data)
+        self.assertEqual(response.status_code, 200)
+        posted_slug = Url.objects.get(slug=self.recent_slug)
+        self.assertEqual(posted_slug.created_at, self.recent_date)
+
+    def test_create_funny_slug_with_valid_custom_slug(self):
+        """Creates entry in Url with funny slug taken from database.
+        Sent custom slug is ignored despite is valid.
+        """
+        n_entries_before_post = Url.objects.count()
+        data = {'slug': 'ignored_slug', 'url': self.valid_url}
+        response = self.client.post(reverse('create_funny_slug'), data)
+        n_entries_after_post = Url.objects.count()
+        self.assertEqual(response.status_code, 302)
+        self.assertIs(n_entries_before_post+1, n_entries_after_post)
 
     def test_create_funny_slug_with_invalid_custom_slug(self):
-        pass
+        """Creates entry in Url with funny slug taken from database.
+        Sent custom slug is ignored despite is invalid.
+        """
+        n_entries_before_post = Url.objects.count()
+        data = {'slug': 'invalid._._;,slug', 'url': self.valid_url}
+        response = self.client.post(reverse('create_funny_slug'), data)
+        n_entries_after_post = Url.objects.count()
+        self.assertEqual(response.status_code, 302)
+        self.assertIs(n_entries_before_post+1, n_entries_after_post)
 
     def test_create_chuck_slug_without_custom_slug(self):
-        pass
+        """Creates entry in Url with fact about chuck norris slug taken from external api.
+        Sent custom slug is ignored despite is valid.
+        """
+        n_entries_before_post = Url.objects.count()
+        data = {'slug': 'valid_slug', 'url': self.valid_url}
+        response = self.client.post(reverse('create_chuck_slug'), data)
+        n_entries_after_post = Url.objects.count()
+        self.assertEqual(response.status_code, 302)
+        self.assertIs(n_entries_before_post+1, n_entries_after_post)
 
     def test_create_chuck_slug_with_invalid_custom_slug(self):
-        pass
+        """Creates entry in Url with fact about chuck norris slug taken from external api.
+        Sent custom slug is ignored despite is invalid.
+        """
+        n_entries_before_post = Url.objects.count()
+        data = {'slug': 'invalid._._;,slug', 'url': self.valid_url}
+        response = self.client.post(reverse('create_chuck_slug'), data)
+        n_entries_after_post = Url.objects.count()
+        self.assertEqual(response.status_code, 302)
+        self.assertIs(n_entries_before_post+1, n_entries_after_post)
 
 
 class AccountsPagesTest(SimpleTestCase):
