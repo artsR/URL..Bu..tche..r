@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
 import os
+import dj_database_url
 
 from pathlib import Path
 from django.contrib.messages import constants as msg_constants
@@ -85,6 +86,9 @@ DATABASES = {
         'NAME': BASE_DIR / 'dbutcher.sqlite3',
     }
 }
+
+db_from_env = dj_database_url.config(conn_max_age=600)
+DATABASES['default'].update(db_from_env)
 
 
 # Password validation
