@@ -8,7 +8,7 @@ from django.http import Http404
 
 
 def get_chuck_norris_fact(threshold):
-    """Get random fact about Chuck Norris no longer than `threshold`."""
+    """Get random fact about Chuck Norris of length less than `threshold`."""
     url = 'https://api.chucknorris.io/jokes/random'
     cleaned_fact = None
     while cleaned_fact is None:
@@ -48,8 +48,8 @@ def update_cookie_last_slugs(request, url, slug):
     slug_cookies = request.COOKIES.get('slug_cookies', json.dumps(list()))
     try:
         slug_history = json.loads(slug_cookies)
-        slug_history.extend(
-            (url, f"http://{request.META['HTTP_HOST']}/{slug}")
+        slug_history.append(
+            (url, f'{request.build_absolute_uri(slug)}', slug)
         )
     except TypeError:
         pass
@@ -58,4 +58,6 @@ def update_cookie_last_slugs(request, url, slug):
         pass
     return json.dumps(slug_history[-4:])
 
-
+def load_cookie_last_slugs(request):
+    slug_cookies = request.COOKIES.get('slug_cookies', None)
+    return json.loads(slug_cookies) if slug_cookies is not None else None

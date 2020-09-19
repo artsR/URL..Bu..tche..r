@@ -50,4 +50,25 @@
     </form>
   </div>
 </div>
+<!-- last slugs -->
+{% if last_slugs %}
+<div class="card border-0 mx-auto col-xl-10">
+  <div class="card-body">
+    <ul class="list-group">
+      {% for slug in last_slugs %}
+      <li class="list-group-item d-flex flex-wrap justify-content-between">
+        <span>{{slug.0}}</span>
+        <span class="text-truncate">
+          <a class="list-group-item-action list-group-item-light" href="{{slug.1}}">{{slug.2}}</a>
+        </span>
+      </li>
+      {% endfor %}
+    </ul>
+    <form action="{% url 'reset_cookie_last_slugs' %}" method='POST'>
+      {% csrf_token %}
+      <input class="mt-3 btn btn-sm btn-link text-info" type="submit" value="Reset history"/>
+    </form>
+  </div>
+</div>
+{% endif %}
 {% endblock content %}

@@ -10,7 +10,9 @@ from django.views.decorators.http import require_http_methods
 
 from .models import Url, FunnyQuote
 from .forms import UrlForm
-from .utils import get_chuck_norris_fact, update_cookie_last_slugs
+from .utils import (
+    get_chuck_norris_fact, update_cookie_last_slugs, load_cookie_last_slugs
+)
 
 
 ALPHABET = string.ascii_letters + string.digits + '_- '
@@ -30,7 +32,18 @@ def home(request):
 
     context = dict(form=form)
 
+    last_slugs = load_cookie_last_slugs(request)
+    if last_slugs is not None:
+        context.update({'last_slugs': last_slugs})
+
     return render(request, 'home.html', context)
+
+
+@require_http_methods(['POST'])
+def reset_cookie_last_slugs(request):
+    response = redirect('home')
+    response.delete_cookie('slug_cookies')
+    return response
 
 
 @require_http_methods(['GET'])
@@ -61,7 +74,11 @@ def create_short_slug(request):
         )
         messages.info(request, 'Your link can be used for at least 7 days.')
 
-        return redirect('home')
+        recent_slugs = update_cookie_last_slugs(request, new_url, new_slug)
+        response = redirect('home')
+        response.set_cookie(key='slug_cookies', value=recent_slugs)
+
+        return response
 
     messages.error(request, 'Provided invalid data. Please try again')
     context = dict(form=form)
@@ -94,7 +111,11 @@ def create_funny_slug(request):
         messages.info(request, 'Your link can be used for at least 7 days.')
         messages.info(request, f'Your slug: {new_slug}')
 
-        return redirect('home')
+        recent_slugs = update_cookie_last_slugs(request, new_url, new_slug)
+        response = redirect('home')
+        response.set_cookie(key='slug_cookies', value=recent_slugs)
+
+        return response
 
     messages.error(request, 'Provided invalid data. Please try again')
     context = dict(form=form)
@@ -127,7 +148,11 @@ def create_chuck_norris_slug(request):
         messages.info(request, 'Your link can be used for at least 7 days.')
         messages.info(request, f'Your slug: {new_slug}')
 
-        return redirect('home')
+        recent_slugs = update_cookie_last_slugs(request, new_url, new_slug)
+        response = redirect('home')
+        response.set_cookie(key='slug_cookies', value=recent_slugs)
+
+        return response
 
     messages.error(request, 'Provided invalid data. Please try again')
     context = dict(form=form)
