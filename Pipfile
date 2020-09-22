@@ -5,7 +5,6 @@ verify_ssl = true
 
 [dev-packages]
 whitenoise = "*"
-psycopg2 = "*"
 gunicorn = "*"
 
 [packages]
@@ -16,6 +15,7 @@ python-dotenv = "*"
 dj-database-url = "*"
 django-storages = "*"
 boto3 = "*"
+psycopg2 = "*"
 
 [requires]
 python_version = "3.8"
