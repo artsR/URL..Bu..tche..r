@@ -2,15 +2,13 @@ import random
 import string
 from datetime import timedelta
 
+from django.core.exceptions import ValidationError
 from django.test import TestCase, SimpleTestCase
 from django.utils import timezone
 from django.urls import reverse
-from django.core.exceptions import ValidationError
 
-from .models import Url, FunnyQuote, EXPIRES_IN
 from .forms import UrlForm
-
-# Create your tests here.
+from .models import Url, FunnyQuote, EXPIRES_IN
 
 
 
@@ -93,7 +91,7 @@ class ViewsTest(TestCase):
         posted_slug = Url.objects.get(slug=self.unique_slug)
         self.assertEqual(posted_slug.url, self.valid_url)
 
-    def test_create_short_slug_with_custome_expired_slug(self):
+    def test_create_short_slug_with_custom_expired_slug(self):
         """Creates entry in Url with short slug provided by user and redirects to 'home'
         There is  conflict with slug already created but because of expiration
         it will be overwritten.
@@ -210,7 +208,7 @@ class UrlModelTest(TestCase):
         sample_slugs = list()
         url = 'http://www.example.pl'
         for i in range(no_of_entries):
-            random_slug = Url.get_unique_slug(POPULATION, k=1)
+            random_slug = Url.get_unique_slug(POPULATION, chars_to_draw=1)
             entry = create_db_entry(Url, slug=random_slug, url=url)
             sample_slugs.append(random_slug)
 
@@ -237,7 +235,7 @@ class UrlModelTest(TestCase):
         )
 
         random.seed(100)
-        new_slug = Url.get_unique_slug(POPULATION, k=max_slug_len)
+        new_slug = Url.get_unique_slug(POPULATION, chars_to_draw=max_slug_len)
 
         self.assertEqual(new_slug, expired_entry.slug)
 

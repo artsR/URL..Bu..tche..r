@@ -1,24 +1,25 @@
 import random
 import string
 
-from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
 from django.http import HttpResponse, HttpResponseRedirect, QueryDict
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.utils import timezone
-from django.contrib import messages
 from django.views.decorators.http import require_http_methods
 
-from .models import Url, FunnyQuote
 from .forms import UrlForm
+from .models import Url, FunnyQuote
 from .utils import (
     get_chuck_norris_fact, update_cookie_last_slugs, load_cookie_last_slugs
 )
 
 
+
 ALPHABET = string.ascii_letters + string.digits + '_- '
 CHUCK_FACT_LEN_THRESHOLD = 100
 
-# Create your views here.
+
 
 @require_http_methods(['GET'])
 def home(request):
@@ -96,7 +97,7 @@ def create_funny_slug(request):
         new_url = form.cleaned_data.get('url')
         slug_quote = FunnyQuote.objects.random()
         new_slug = Url.get_unique_slug(
-            ALPHABET, k=3, custom_slug=f'_{slug_quote}', sep='_'
+            ALPHABET, chars_to_draw=3, custom_slug=f'_{slug_quote}', separator='_'
         )
 
         Url.objects.update_or_create(
@@ -133,7 +134,7 @@ def create_chuck_norris_slug(request):
         new_url = form.cleaned_data.get('url')
         slug_fact = get_chuck_norris_fact(CHUCK_FACT_LEN_THRESHOLD)
         new_slug = Url.get_unique_slug(
-            ALPHABET, k=3, custom_slug=f'{slug_fact}', sep='__'
+            ALPHABET, chars_to_draw=3, custom_slug=f'{slug_fact}', separator='__'
         )
 
         Url.objects.update_or_create(

@@ -4,8 +4,10 @@ from datetime import datetime, timedelta
 from django.db import models
 from django.utils import timezone
 
-# Create your models here.
+
+
 EXPIRES_IN = 7
+
 
 
 class Url(models.Model):
@@ -17,21 +19,21 @@ class Url(models.Model):
         return self.created_at + timedelta(days=EXPIRES_IN) < timezone.now()
 
     @classmethod
-    def get_unique_slug(cls, alphabet, *, k=6, custom_slug='', sep=''):
+    def get_unique_slug(cls, alphabet, *, chars_to_draw=6, custom_slug='', separator=''):
         """Generates unique slug. Ready to save into database.
 
         Args:
             alphabet: Population of characters to draw
-            k: Number of characters to draw
+            chars_to_draw: Number of characters to draw
             custom_slug: Suffix slug eg. funny quote
-            sep: Seperator between random prefix and custom suffix
+            separator: Seperator between random prefix and custom suffix
         """
         #TODO: add some kind of timeout...
         while True:
             slug_id = ''.join(
-                c for c in random.choices(alphabet, k=k) if c != ' '
+                char for char in random.choices(alphabet, k=chars_to_draw) if char != ' '
             )
-            slug_id = f'{slug_id}{sep}{custom_slug}'
+            slug_id = f'{slug_id}{separator}{custom_slug}'
             try:
                 slug = cls.objects.get(slug=slug_id)
             except cls.DoesNotExist:

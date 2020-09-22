@@ -1,6 +1,6 @@
+import json
 import re
 import requests
-import json
 from requests.exceptions import HTTPError
 
 from django.http import Http404
@@ -21,8 +21,8 @@ def get_chuck_norris_fact(threshold):
 
         fact_json = response.json()
         fact_raw = fact_json.get('value')
-        fact, len_fact = clean_chuck_norris_fact(fact_raw)
-        cleaned_fact = fact if len_fact < threshold else None
+        fact = clean_chuck_norris_fact(fact_raw)
+        cleaned_fact = fact if len(fact) < threshold else None
 
     return cleaned_fact
 
@@ -41,7 +41,7 @@ def clean_chuck_norris_fact(fact):
 
     cleaned_fact = ''.join(word.title() for word in fact.split())
 
-    return cleaned_fact, len(cleaned_fact)
+    return cleaned_fact
 
 
 def update_cookie_last_slugs(request, url, slug):
