@@ -1,7 +1,7 @@
 # URL.Bu..tcher
 
 ## Technology
-Django
+Django, AWS, Heroku
 
 ## Overview
 
@@ -12,4 +12,3 @@ Basic functionality ready to use. Adding facilities for logged users in progress
 
 ## Usage
 you can find application on [Heroku](https://urlbutcher.herokuapp.com/)
-Static files are stored on AWS Bucket.
