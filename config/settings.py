@@ -30,7 +30,7 @@ load_dotenv(os.path.join(BASE_DIR, '.env'))
 SECRET_KEY = os.environ.get('SECRET_KEY') or ')t0#scwjkclr$a3x8n!-jr07(mg+52#!w$ju5*m&ml&&l58q3s'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG', True)
+DEBUG = os.environ.get('DEBUG', False)
 
 ALLOWED_HOSTS = [
     'urlbutcher.herokuapp.com',
