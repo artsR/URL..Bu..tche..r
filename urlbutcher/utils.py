@@ -49,7 +49,7 @@ def update_cookie_last_slugs(request, url, slug):
     try:
         slug_history = json.loads(slug_cookies)
         slug_history.append(
-            (url, f'{request.build_absolute_uri(slug)}', slug)
+            (url, f'{request.META["HTTP_REFERER"]}{slug}', slug)
         )
     except TypeError:
         pass
