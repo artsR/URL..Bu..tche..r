@@ -33,7 +33,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY') or ')t0#scwjkclr$a3x8n!-jr07(mg+52#!w$
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    'codart-urlbutcher.herokuapp.com',
+    'urlbutcher.herokuapp.com',
     '127.0.0.1',
 ]
 
