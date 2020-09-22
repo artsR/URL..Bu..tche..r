@@ -44,6 +44,7 @@ class SlugPagesTest(SimpleTestCase):
 class ViewsTest(TestCase):
     def setUp(self):
         self.valid_url = 'http://www.example.pl/example-example/example'
+        self.header_http_referer = 'http://127.0.0.1'
         self.unique_slug = 'tEsT'
         self.expired_slug = 'aBcD'
         self.recent_slug = 'xYz'
@@ -85,7 +86,9 @@ class ViewsTest(TestCase):
         There is no conflict with slugs already created.
         """
         data = {'slug': self.unique_slug, 'url': self.valid_url}
-        response = self.client.post(reverse('create_short_slug'), data)
+        response = self.client.post(
+            reverse('create_short_slug'), data, HTTP_REFERER=self.header_http_referer
+        )
         self.assertEqual(response.status_code, 302)
         # Retrieve posted object from db:
         posted_slug = Url.objects.get(slug=self.unique_slug)
@@ -97,7 +100,9 @@ class ViewsTest(TestCase):
         it will be overwritten.
         """
         data = {'slug': self.expired_slug, 'url': self.valid_url}
-        response = self.client.post(reverse('create_short_slug'), data)
+        response = self.client.post(
+            reverse('create_short_slug'), data, HTTP_REFERER=self.header_http_referer
+        )
         self.assertEqual(response.status_code, 302)
         # Retrieve posted object:
         posted_slug = Url.objects.get(slug=self.expired_slug)
@@ -108,7 +113,9 @@ class ViewsTest(TestCase):
         There is conflict with slugs already created - entry will not be created.
         """
         data = {'slug': self.recent_slug, 'url': self.valid_url}
-        response = self.client.post(reverse('create_short_slug'), data)
+        response = self.client.post(
+            reverse('create_short_slug'), data, HTTP_REFERER=self.header_http_referer
+        )
         self.assertEqual(response.status_code, 200)
         posted_slug = Url.objects.get(slug=self.recent_slug)
         self.assertEqual(posted_slug.created_at, self.recent_date)
@@ -119,7 +126,9 @@ class ViewsTest(TestCase):
         """
         n_entries_before_post = Url.objects.count()
         data = {'slug': 'ignored_slug', 'url': self.valid_url}
-        response = self.client.post(reverse('create_funny_slug'), data)
+        response = self.client.post(
+            reverse('create_funny_slug'), data, HTTP_REFERER=self.header_http_referer
+        )
         n_entries_after_post = Url.objects.count()
         self.assertEqual(response.status_code, 302)
         self.assertIs(n_entries_before_post+1, n_entries_after_post)
@@ -130,7 +139,9 @@ class ViewsTest(TestCase):
         """
         n_entries_before_post = Url.objects.count()
         data = {'slug': 'invalid._._;,slug', 'url': self.valid_url}
-        response = self.client.post(reverse('create_funny_slug'), data)
+        response = self.client.post(
+            reverse('create_funny_slug'), data, HTTP_REFERER=self.header_http_referer
+        )
         n_entries_after_post = Url.objects.count()
         self.assertEqual(response.status_code, 302)
         self.assertIs(n_entries_before_post+1, n_entries_after_post)
@@ -141,7 +152,9 @@ class ViewsTest(TestCase):
         """
         n_entries_before_post = Url.objects.count()
         data = {'slug': 'valid_slug', 'url': self.valid_url}
-        response = self.client.post(reverse('create_chuck_slug'), data)
+        response = self.client.post(
+            reverse('create_chuck_slug'), data, HTTP_REFERER=self.header_http_referer
+        )
         n_entries_after_post = Url.objects.count()
         self.assertEqual(response.status_code, 302)
         self.assertIs(n_entries_before_post+1, n_entries_after_post)
@@ -152,7 +165,9 @@ class ViewsTest(TestCase):
         """
         n_entries_before_post = Url.objects.count()
         data = {'slug': 'invalid._._;,slug', 'url': self.valid_url}
-        response = self.client.post(reverse('create_chuck_slug'), data)
+        response = self.client.post(
+            reverse('create_chuck_slug'), data, HTTP_REFERER=self.header_http_referer
+        )
         n_entries_after_post = Url.objects.count()
         self.assertEqual(response.status_code, 302)
         self.assertIs(n_entries_before_post+1, n_entries_after_post)
