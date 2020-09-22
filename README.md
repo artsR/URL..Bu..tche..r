@@ -9,4 +9,4 @@ Application is a url shortener. You can convert long url into short, convenient 
 Your url can be also converted into funny quote or fact about Chuck Norris
 
 ## Usage
-you can find application on [Heroku](www.urlbutcher.heroku.com)
+you can find application on [Heroku](https://urlbutcher.herokuapp.com/)
