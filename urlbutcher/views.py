@@ -26,7 +26,7 @@ def home(request):
     slug_id = request.session.pop('slug_id', None)
 
     if slug_id is None:
-        form = UrlForm()
+        form = UrlForm(user=request.user)
     else:
         uri = request.build_absolute_uri(slug_id)
         form = UrlForm(initial={'slug': uri})
