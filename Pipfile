@@ -4,8 +4,6 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
-whitenoise = "*"
-gunicorn = "*"
 
 [packages]
 django = "*"
@@ -17,6 +15,8 @@ django-storages = "*"
 boto3 = "*"
 psycopg2 = "*"
 django-recaptcha = "*"
+whitenoise = "*"
+gunicorn = "*"
 
 [requires]
 python_version = "3.8"
