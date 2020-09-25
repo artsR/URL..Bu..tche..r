@@ -56,7 +56,7 @@ def redirect_slug(request, slug_id):
 @require_http_methods(['POST'])
 def create_short_slug(request):
     """Creates short `slug` for given URL using random characters."""
-    form = UrlForm(request.POST)
+    form = UrlForm(request.POST, user=request.user)
 
     if form.is_valid():
         new_url = form.cleaned_data.get('url')
@@ -90,7 +90,7 @@ def create_short_slug(request):
 @require_http_methods(['POST'])
 def create_funny_slug(request):
     """Creates funny quotes as `slug` for given URL using database."""
-    form = UrlForm(request.POST)
+    form = UrlForm(request.POST, user=request.user)
     form.fields['slug'].disabled = True
 
     if form.is_valid():
@@ -127,7 +127,7 @@ def create_funny_slug(request):
 @require_http_methods(['POST'])
 def create_chuck_norris_slug(request):
     """Creates chuck norris fact as `slug` for given URL using external api."""
-    form = UrlForm(request.POST)
+    form = UrlForm(request.POST, user=request.user)
     form.fields['slug'].disabled = True
 
     if form.is_valid():
