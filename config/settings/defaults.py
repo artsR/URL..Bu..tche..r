@@ -43,8 +43,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # 3rd-party:
     'widget_tweaks',
-    'captcha',
     'storages',
+    'captcha',
     # local:
     'urlbutcher',
     'accounts',

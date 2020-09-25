@@ -1,3 +1,6 @@
+from captcha.fields import ReCaptchaField
+from captcha.widgets import ReCaptchaV2Checkbox
+
 from django import forms
 
 from .models import Url
@@ -13,6 +16,12 @@ class UrlForm(forms.Form):
         required=False,
         widget=forms.TextInput(attrs={'placeholder': 'Custom Slug', 'class': ''})
     )
+
+    def __init__(self, *args, user=None, **kwargs):
+        super(UrlForm, self).__init__(*args, **kwargs)
+        if (user is not None) and (not user.is_authenticated):
+            self.fields['captcha'] = ReCaptchaField(widget=ReCaptchaV2Checkbox)
+
 
     def clean_slug(self):
         """Checks if provided by user `slug` can be saved into database:
