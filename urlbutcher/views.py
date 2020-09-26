@@ -2,6 +2,7 @@ import random
 import string
 
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect, QueryDict
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
@@ -38,6 +39,11 @@ def home(request):
         context.update({'last_slugs': last_slugs})
 
     return render(request, 'home.html', context)
+
+
+@login_required
+def dashboard(request):
+    return render(request, 'dashboard.html')
 
 
 @require_http_methods(['POST'])
