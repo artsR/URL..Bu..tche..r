@@ -2,13 +2,15 @@ import random
 import string
 from datetime import timedelta
 
+from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.test import TestCase, SimpleTestCase, Client
 from django.utils import timezone
 from django.urls import reverse
 
 from .forms import UrlForm
-from .models import Url, FunnyQuote, EXPIRES_IN
+from .models import Url, FunnyQuote, SlugClickCounter, EXPIRES_IN
+from .signals import FIELDS_PREVENT_RESET_COUNTER
 
 
 
@@ -273,3 +275,78 @@ class UrlFormTest(TestCase):
         form = UrlForm(data={'url':self.valid_url, 'slug': slug_already_in_db})
         self.assertFalse(form.is_valid())
         self.assertTrue(form.has_error('slug', code='already_used'))
+
+
+
+class SignalTest(TestCase):
+    def setUp(self):
+        self.auth_user = User.objects.create(username='test', password='Test123')
+        self.valid_url = 'http://www.example.pl'
+        self.valid_slug = 'aBcD'
+
+    def test_new_slug_click_counter_authenticated(self):
+        """Adding Url model instance as authenticated user create
+        SlugClickCounter instance."""
+        slug_obj = create_db_entry(
+            Url, slug='valid_slug', url='http://www.example.pl', user=self.auth_user
+        )
+        slug_counter_obj = SlugClickCounter.objects.first()
+        self.assertEqual(slug_counter_obj.slug, slug_obj)
+
+    def test_new_slug_click_counter_anonymous(self):
+        """Adding Url model instance as anonymous user doesn't create
+        SlugClickCounter instance.
+        """
+        slug_obj = create_db_entry(Url, slug=self.valid_slug, url=self.valid_url)
+        slug_counter_obj = SlugClickCounter.objects.first()
+        self.assertIs(slug_counter_obj, None)
+
+    def test_update_slug_click_counter_anonymous(self):
+        """update_slug_click_counter() should delete existing counter if corresponding
+        slug was overwritten by anonymous user.
+        """
+        slug_obj = create_db_entry(Url, slug=self.valid_slug, url=self.valid_url)
+        slug_counter_obj = create_db_entry(
+            SlugClickCounter, slug=slug_obj, click_counter=10
+        )
+        self.assertIs(slug_counter_obj.slug, slug_obj)
+
+        slug_obj.url = 'http://www.changed_url.pl'
+        slug_obj.save()
+        non_existing_slug_counter = SlugClickCounter.objects.first()
+        self.assertIs(non_existing_slug_counter, None)
+
+    def test_update_slug_click_counter_authenticated(self):
+        """update_slug_click_counter() should reset existing counter if corresponding
+        slug was overwritten by authenticated user.
+        """
+        slug_obj = create_db_entry(
+            Url, slug=self.valid_slug, url=self.valid_url, user=self.auth_user
+        )
+        slug_counter_obj = SlugClickCounter.objects.first()
+        self.assertEqual(slug_counter_obj.slug, slug_obj)
+
+        slug_obj.url = 'http://www.changed_url.pl'
+        slug_obj.save()
+        reset_slug_counter = SlugClickCounter.objects.first()
+        self.assertIs(reset_slug_counter.click_counter, 0)
+
+    def test_update_slug_click_counter_for_non_reset_fields(self):
+        """update_slug_click_counter() should keep existing counter untouched
+        if fields of corresponding slug that was overwritten and passed to save()
+        are subset of fields preventing counter to be reset.
+        """
+        non_reset_fields = {'created_at'}
+        self.assertTrue(non_reset_fields.issubset(FIELDS_PREVENT_RESET_COUNTER))
+
+        slug_obj = create_db_entry(
+            Url, slug=self.valid_slug, url=self.valid_url, user=self.auth_user
+        )
+        slug_counter_obj = SlugClickCounter.objects.first()
+        ARBITRARY_NUMBER = 14
+        slug_counter_obj.click_counter = ARBITRARY_NUMBER
+        slug_counter_obj.save()
+
+        slug_obj.created_at = timezone.now()
+        slug_obj.save(update_fields=non_reset_fields)
+        self.assertIs(slug_counter_obj.click_counter, ARBITRARY_NUMBER)
