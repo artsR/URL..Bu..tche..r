@@ -1,3 +1,5 @@
+import sys
+
 from captcha.fields import ReCaptchaField
 from captcha.widgets import ReCaptchaV2Checkbox
 
@@ -19,7 +21,8 @@ class UrlForm(forms.Form):
 
     def __init__(self, *args, user=None, **kwargs):
         super(UrlForm, self).__init__(*args, **kwargs)
-        if (user is not None) and (not user.is_authenticated):
+        testing_mode = 'test' in sys.argv
+        if (not testing_mode) and (user is not None) and (not user.is_authenticated):
             self.fields['captcha'] = ReCaptchaField(widget=ReCaptchaV2Checkbox)
 
     def clean_slug(self):
