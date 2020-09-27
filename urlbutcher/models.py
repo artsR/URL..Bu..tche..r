@@ -1,6 +1,7 @@
 import random
 from datetime import datetime, timedelta
 
+from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
 
@@ -15,8 +16,13 @@ class Url(models.Model):
     url = models.URLField(max_length=512)
     created_at = models.DateTimeField(default=timezone.now, blank=True)
 
+    user = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)
+
     def expired(self):
         return self.created_at + timedelta(days=EXPIRES_IN) < timezone.now()
+
+    def __str__(self):
+        return f'{self.url}\n{self.slug}'
 
     @classmethod
     def get_unique_slug(cls, alphabet, *, chars_to_draw=6, custom_slug='', separator=''):
@@ -44,8 +50,13 @@ class Url(models.Model):
                     break
         return slug_id
 
+
+class SlugClickCounter(models.Model):
+    slug = models.OneToOneField(Url, on_delete=models.CASCADE, primary_key=True)
+    click_counter = models.PositiveIntegerField(default=0)
+
     def __str__(self):
-        return f'{self.url}\n{self.slug}'
+        return f'{self.slug} : {self.click_counter}'
 
 
 class FunnyQuoteManager(models.Manager):
