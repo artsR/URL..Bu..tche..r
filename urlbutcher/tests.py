@@ -43,8 +43,24 @@ class SlugPagesTest(SimpleTestCase):
         self.assertEqual(response.status_code, 200)
 
 
+class RedirectPagesTest(TestCase):
+    def setUp(self):
+        self.existing_slug = 'existing_slug'
+        self.non_existing_slug = 'non_existing_slug'
+        create_db_entry(Url, slug=self.existing_slug, url='http://www.example.pl')
+
+    def test_redirect_page_status_code_existing_slug(self):
+        response = self.client.get(f'/{self.existing_slug}')
+        self.assertEqual(response.status_code, 301)
+
+    def test_redirect_page_status_code_non_existing_slug(self):
+        response = self.client.get(f'/{self.non_existing_slug}', follow=True)
+        self.assertEqual(response.status_code, 404)
+
+
 class ViewsTest(TestCase):
     def setUp(self):
+        self.auth_user = User.objects.create(username='test', password='Test123')
         self.client = Client(HTTP_REFERER='http://127.0.0.1')
         self.valid_url = 'http://www.example.pl/example-example/example'
         self.unique_slug = 'tEsT'
@@ -163,6 +179,19 @@ class ViewsTest(TestCase):
         n_entries_after_post = Url.objects.count()
         self.assertEqual(response.status_code, 302)
         self.assertIs(n_entries_before_post+1, n_entries_after_post)
+
+    def test_redirect_slug_with_authenticated_slug(self):
+        """Increments by 1 click_counter for slug created by authenticated user
+        if slug was clicked to redirect to target url.
+        """
+        slug_obj = create_db_entry(
+            Url, slug='new_slug', url=self.valid_url, user=self.auth_user
+        )
+        response = self.client.get('/new_slug')
+        count_obj = SlugClickCounter.objects.get(slug=slug_obj)
+        self.assertEqual(slug_obj, count_obj.slug)
+        self.assertIs(count_obj.click_counter, 1)
+
 
 
 class AccountsPagesTest(SimpleTestCase):
