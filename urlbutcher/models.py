@@ -52,7 +52,9 @@ class Url(models.Model):
 
 
 class SlugClickCounter(models.Model):
-    slug = models.OneToOneField(Url, on_delete=models.CASCADE, primary_key=True)
+    slug = models.OneToOneField(
+        Url, primary_key=True, on_delete=models.CASCADE, related_name='counter'
+    )
     click_counter = models.PositiveIntegerField(default=0)
 
     def __str__(self):
