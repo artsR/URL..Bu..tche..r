@@ -3,6 +3,7 @@ import string
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.db.models import F
 from django.http import HttpResponse, HttpResponseRedirect, QueryDict
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
@@ -10,7 +11,7 @@ from django.utils import timezone
 from django.views.decorators.http import require_http_methods
 
 from .forms import UrlForm
-from .models import Url, FunnyQuote
+from .models import Url, FunnyQuote, SlugClickCounter
 from .utils import (
     get_chuck_norris_fact, update_cookie_last_slugs, load_cookie_last_slugs
 )
@@ -56,6 +57,12 @@ def reset_cookie_last_slugs(request):
 @require_http_methods(['GET'])
 def redirect_slug(request, slug_id):
     website = get_object_or_404(Url, pk=slug_id)
+
+    slug_to_redirect = SlugClickCounter.objects.filter(pk=website).first()
+    if slug_to_redirect is not None:
+        slug_to_redirect.click_counter = F('click_counter') + 1
+        slug_to_redirect.save()
+
     return HttpResponseRedirect(website.url)
 
 
@@ -69,10 +76,11 @@ def create_short_slug(request):
         custom_slug = form.cleaned_data.get('slug')
 
         new_slug = custom_slug if custom_slug else Url.get_unique_slug(ALPHABET)
+        user = request.user if request.user.is_authenticated else None
 
         Url.objects.update_or_create(
             slug=new_slug,
-            defaults={'url': new_url, 'created_at': timezone.now()}
+            defaults={'url': new_url, 'created_at': timezone.now(), 'user': user}
         )
         request.session['slug_id'] = new_slug
 
@@ -105,10 +113,11 @@ def create_funny_slug(request):
         new_slug = Url.get_unique_slug(
             ALPHABET, chars_to_draw=3, custom_slug=f'_{slug_quote}', separator='_'
         )
+        user = request.user if request.user.is_authenticated else None
 
         Url.objects.update_or_create(
             slug=new_slug,
-            defaults={'url': new_url, 'created_at': timezone.now()}
+            defaults={'url': new_url, 'created_at': timezone.now(), 'user': user}
         )
         request.session['slug_id'] = new_slug
 
@@ -142,10 +151,11 @@ def create_chuck_norris_slug(request):
         new_slug = Url.get_unique_slug(
             ALPHABET, chars_to_draw=3, custom_slug=f'{slug_fact}', separator='__'
         )
+        user = request.user if request.user.is_authenticated else None
 
         Url.objects.update_or_create(
             slug=new_slug,
-            defaults={'url': new_url, 'created_at': timezone.now()}
+            defaults={'url': new_url, 'created_at': timezone.now(), 'user': user}
         )
         request.session['slug_id'] = new_slug
 
