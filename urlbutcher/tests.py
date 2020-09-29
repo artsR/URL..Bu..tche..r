@@ -14,8 +14,10 @@ from .signals import FIELDS_PREVENT_RESET_COUNTER
 
 
 
-def create_db_entry(cls, **kwargs):
+def create_db_entry(cls, password=None, **kwargs):
     entry = cls(**kwargs)
+    if password is not None:
+        entry.set_password(password)
     entry.save()
     return entry
 
@@ -58,9 +60,86 @@ class RedirectPagesTest(TestCase):
         self.assertEqual(response.status_code, 404)
 
 
+class PagesTest(TestCase):
+    def setUp(self):
+        self.credentials_userA = {'username': 'userA', 'password': 'ATest123'}
+        self.credentials_userB = {'username': 'userB', 'password': 'BTest123'}
+        self.auth_userA = create_db_entry(User, **self.credentials_userA)
+        self.auth_userB = create_db_entry(User, **self.credentials_userB)
+        self.client = Client()
+        self.unique_slug = 'tEsT'
+        self.valid_url = 'http://www.example.pl/example-example/example'
+
+    def test_refresh_slug_as_unauthorized_user(self):
+        """refresh_slug() should return 403 if user attempts to refresh slug that
+        is not created by him.
+        """
+        create_db_entry(
+            Url, slug=self.unique_slug, url=self.valid_url, user=self.auth_userB
+        )
+        self.client.login(**self.credentials_userA)
+        response = self.client.post(
+            reverse('refresh_slug', kwargs={'slug_id': self.unique_slug})
+        )
+        self.assertEqual(response.status_code, 403)
+
+    def test_refresh_slug_as_authorized_user(self):
+        """refresh_slug() should return 302 if user attempts to refresh slug that
+        is created by him.
+        """
+        create_db_entry(
+            Url, slug=self.unique_slug, url=self.valid_url, user=self.auth_userA
+        )
+        self.client.login(**self.credentials_userA)
+        response = self.client.post(
+            reverse('refresh_slug', kwargs={'slug_id': self.unique_slug})
+        )
+        self.assertEqual(response.status_code, 302)
+
+    def test_delete_slug_as_unauthorized_user(self):
+        """refresh_slug() should return 403 if user attempts to delete slug that
+        is not created by him.
+        """
+        create_db_entry(
+            Url, slug=self.unique_slug, url=self.valid_url, user=self.auth_userB
+        )
+        self.client.login(**self.credentials_userA)
+        response = self.client.post(
+            reverse('delete_slug', kwargs={'slug_id': self.unique_slug})
+        )
+        self.assertEqual(response.status_code, 403)
+
+    def test_delete_slug_as_authorized_user(self):
+        """delete_slug() should return 302 if user attempts to delete slug that
+        is created by him.
+        """
+        create_db_entry(
+            Url, slug=self.unique_slug, url=self.valid_url, user=self.auth_userA
+        )
+        self.client.login(**self.credentials_userA)
+        response = self.client.post(
+            reverse('delete_slug', kwargs={'slug_id': self.unique_slug})
+        )
+        self.assertEqual(response.status_code, 302)
+
+    def test_edit_slug_as_unauthorized_user(self):
+        """edit_slug() should return 403 if user attempts to edit slug that
+        is not created by him.
+        """
+        create_db_entry(
+            Url, slug=self.unique_slug, url=self.valid_url, user=self.auth_userB
+        )
+        self.client.login(**self.credentials_userA)
+        response = self.client.post(
+            reverse('edit_slug', kwargs={'slug_id': self.unique_slug})
+        )
+        self.assertEqual(response.status_code, 403)
+
+
+
 class ViewsTest(TestCase):
     def setUp(self):
-        self.auth_user = User.objects.create(username='test', password='Test123')
+        self.auth_user = create_db_entry(User, username='user', password='Test123')
         self.client = Client(HTTP_REFERER='http://127.0.0.1')
         self.valid_url = 'http://www.example.pl/example-example/example'
         self.unique_slug = 'tEsT'
@@ -187,7 +266,9 @@ class ViewsTest(TestCase):
         slug_obj = create_db_entry(
             Url, slug='new_slug', url=self.valid_url, user=self.auth_user
         )
-        response = self.client.get('/new_slug')
+        response = self.client.get(
+            reverse('redirect_slug', kwargs={'slug_id': 'new_slug'})
+        )
         count_obj = SlugClickCounter.objects.get(slug=slug_obj)
         self.assertEqual(slug_obj, count_obj.slug)
         self.assertIs(count_obj.click_counter, 1)
