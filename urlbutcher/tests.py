@@ -61,6 +61,7 @@ class RedirectPagesTest(TestCase):
 
 
 class PagesTest(TestCase):
+    """Tests for delete_slug(), edit_slug() and refresh_slug() Pages."""
     def setUp(self):
         self.credentials_userA = {'username': 'userA', 'password': 'ATest123'}
         self.credentials_userB = {'username': 'userB', 'password': 'BTest123'}
@@ -272,6 +273,12 @@ class ViewsTest(TestCase):
         count_obj = SlugClickCounter.objects.get(slug=slug_obj)
         self.assertEqual(slug_obj, count_obj.slug)
         self.assertIs(count_obj.click_counter, 1)
+
+    def test_delete_slug_as_authorized_user(self):
+        pass
+
+    def test_edit_slug_as_authorized_user(self):
+        pass
 
 
 
