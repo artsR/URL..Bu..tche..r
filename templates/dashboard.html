@@ -6,7 +6,7 @@
     <p class="h4">Your slugs</p>
     <ul class="list-group mt-3">
       {% for slug_item in user_slugs %}
-      <li class="list-group-item d-flex justify-content-between align-items-center">
+      <li class="list-group-item d-flex flex-wrap justify-content-between align-items-center">
         <a class="text-truncate link-primary" title="{{ slug_item.url }}"
             href="{% url 'redirect_slug' slug_item.slug %}">
           {% if slug_item.expired %}
