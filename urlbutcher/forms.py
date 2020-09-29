@@ -24,7 +24,7 @@ class UrlForm(forms.Form):
         testing_mode = 'test' in sys.argv
         if (not testing_mode) and (user is not None) and (not user.is_authenticated):
             self.fields['captcha'] = ReCaptchaField(widget=ReCaptchaV2Checkbox)
-
+    
     def clean_slug(self):
         """Checks if provided by user `slug` can be saved into database:
         1. there is no record with `slug` ID

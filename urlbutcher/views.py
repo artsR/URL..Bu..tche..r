@@ -4,7 +4,9 @@ import string
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import F
-from django.http import HttpResponse, HttpResponseRedirect, QueryDict
+from django.http import (
+    HttpResponse, HttpResponseRedirect, HttpResponseForbidden, QueryDict
+)
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.utils import timezone
@@ -44,7 +46,11 @@ def home(request):
 
 @login_required
 def dashboard(request):
-    return render(request, 'dashboard.html')
+    user_slugs = request.user.url_set.all()
+
+    context = dict(user_slugs=user_slugs)
+
+    return render(request, 'dashboard.html', context)
 
 
 @require_http_methods(['POST'])
@@ -175,3 +181,50 @@ def create_chuck_norris_slug(request):
     context = dict(form=form)
 
     return render(request, 'home.html', context)
+
+
+@login_required
+def refresh_slug(request, slug_id):
+    slug_obj = get_object_or_404(Url, pk=slug_id)
+    if request.user != slug_obj.user:
+        return HttpResponseForbidden()
+
+    if request.method == 'POST':
+        slug_obj.created_at = timezone.now()
+        slug_obj.save(update_fields=['created_at'])
+
+    return redirect('dashboard')
+
+
+@login_required
+def edit_slug(request, slug_id):
+    slug_obj = get_object_or_404(Url, pk=slug_id)
+    if request.user != slug_obj.user:
+        return HttpResponseForbidden()
+
+    if request.method == 'POST':
+        form = UrlForm(request.POST)
+        if form.is_valid():
+            slug_obj.url = form.cleaned_data['url']
+            slug_obj.created_at = timezone.now()
+            slug_obj.save()
+            return redirect('dashboard')
+    else:
+        form = UrlForm(initial={'slug': slug_obj.slug, 'url': slug_obj.url})
+        form.fields['slug'].disabled = True
+
+    context = dict(form=form)
+
+    return render(request, 'edit_slug.html', context)
+
+
+@login_required
+def delete_slug(request, slug_id):
+    slug_obj = get_object_or_404(Url, pk=slug_id)
+    if request.user != slug_obj.user:
+        return HttpResponseForbidden()
+
+    if request.method == 'POST':
+        slug_obj.delete()
+
+    return redirect('dashboard')
