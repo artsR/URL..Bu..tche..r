@@ -19,7 +19,9 @@
         {% render_field field class="form-control form-control-lg" %}
       {% endif %}
     {% endfor %}
-    <input class="btn btn-primary" type="submit" value="Apply">
+    <input class="btn btn-primary" type="submit" value="Apply"/>
+    <a class="btn btn-secondary link-white" href="{% url 'dashboard' %}">Cancel</a>
+    </div>
     </form>
   </div>
 </div>
