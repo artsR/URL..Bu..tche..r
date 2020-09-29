@@ -1,5 +1,76 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>Placeholder for DASHBOARD</h1>
+<div class="card border-0 mx-auto col-xl-10">
+  <div class="card-body">
+    <p class="h4">Your slugs</p>
+    <ul class="list-group mt-3">
+      {% for slug_item in user_slugs %}
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <a class="text-truncate link-primary" title="{{ slug_item.url }}"
+            href="{% url 'redirect_slug' slug_item.slug %}">
+          {% if slug_item.expired %}
+            <s class="link-secondary">{{ slug_item.slug }}</s>
+          {% else %}
+            {{ slug_item.slug }}
+          {% endif %}
+        </a>
+        <sub class="text-muted">{{ slug_item.created_at }}</sub>
+        <span>
+          <span class="badge bg-light">
+            <span class="badge bg-primary rounded-pill">{{ slug_item.counter.click_counter}}</span>
+            <sub class="text-black-50">clicks</sub>
+          </span>
+          <form class="d-inline-block" action="{% url 'refresh_slug' slug_item.slug %}" method='post'>
+            {% csrf_token %}
+            <button type="submit" class="btn btn-sm bg-secondary" title="refresh expiry date">
+              <i class="fa fa-refresh text-white"></i>
+            </button>
+          </form>
+          <a class="btn btn-sm bg-info text-light" href="{% url 'edit_slug' slug_item.slug %}">
+            Edit
+          </a>
+          <button class="btn btn-sm bg-danger text-light delete-slug" data-id="{{ slug_item.slug }}">
+            Delete
+          </button>
+        </span>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+<script type="text/javascript">
+
+var csrftokenInput = '{% csrf_token %}'
+var deleteBtns = document.querySelectorAll('.delete-slug')
+deleteBtns.forEach(item => {
+  item.addEventListener('click', () => {
+    confirm_delete(item.dataset.id)
+  })
+})
+
+function confirm_delete(slug_id) {
+  swal.fire({
+    title: 'Confirmation',
+    text: 'Are you sure?',
+    icon: 'warning',
+    confirmButtonText: 'Yes, delete it.',
+    confirmButtonColor: '#dc3545',
+    showCancelButton: true,
+    cancelButtonColor: '#adb5bd',
+    reverseButtons: true,
+  })
+  .then(result => {
+    if (result.isConfirmed) {
+      var form = document.createElement('form')
+      form.action = `/slug/delete/${slug_id}/`
+      form.method = 'post'
+      form.innerHTML = csrftokenInput
+      document.body.appendChild(form)
+      form.submit()
+    }
+  })
+}
+
+</script>
 {% endblock content %}
