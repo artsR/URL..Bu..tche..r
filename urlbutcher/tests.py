@@ -140,6 +140,7 @@ class PagesTest(TestCase):
 
 class ViewsTest(TestCase):
     def setUp(self):
+        self.credentials_auth_user = {'username': 'user', 'password': 'Test123'}
         self.auth_user = create_db_entry(User, username='user', password='Test123')
         self.client = Client(HTTP_REFERER='http://127.0.0.1')
         self.valid_url = 'http://www.example.pl/example-example/example'
@@ -275,9 +276,40 @@ class ViewsTest(TestCase):
         self.assertIs(count_obj.click_counter, 1)
 
     def test_delete_slug_as_authorized_user(self):
-        pass
+        """delete_slug() view removes slug and corresponding click counter."""
+        slug_obj = create_db_entry(
+            Url, slug=self.unique_slug, url=self.valid_url, user=self.auth_user
+        )
+        corresponding_click_counter = SlugClickCounter.objects.filter(pk=slug_obj)
+        self.assertTrue(corresponding_click_counter.exists())
 
-    def test_edit_slug_as_authorized_user(self):
+        self.client.login(**self.credentials_auth_user)
+        self.client.post(reverse('delete_slug', kwargs={'slug_id': slug_obj.slug}))
+
+        slug = Url.objects.filter(pk=self.unique_slug)
+        self.assertFalse(slug.exists())
+        self.assertFalse(corresponding_click_counter.exists())
+
+    def test_edit_slug_as_authorized_user_GET(self):
+        """edit_slug() returns UrlForm() with 'slug' field disabled in context ."""
+        self.client.login(**self.credentials_auth_user)
+        slug_to_change = create_db_entry(
+            Url, slug=self.unique_slug, url=self.valid_url, user=self.auth_user
+        )
+        response = self.client.get(
+            reverse(f'edit_slug', kwargs={'slug_id': self.unique_slug})
+        )
+        disabled_slug_field = response.context['form'].fields['slug'].disabled
+        self.assertTrue(disabled_slug_field)
+
+    def test_edit_slug_as_authorized_user_POST(self):
+        # new_url = 'http://www.new_url.pl'
+        # response.context['form'].fields['url'] = new_url
+        # response = self.client.post(
+        #     reverse('edit_slug', kwargs={'slug_id': slug_to_change.slug})
+        # )
+        # # slug_to_change.refresh_from_db()
+        # self.assertEqual(slug_to_change.url, new_url)
         pass
 
 
