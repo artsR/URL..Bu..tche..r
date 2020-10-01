@@ -4,6 +4,8 @@ from . import views
 
 
 
+app_name = 'urlbutcher'
+
 urlpatterns = [
     re_path(r'^$|home/', views.home, name='home'),
     path('slug/', include([

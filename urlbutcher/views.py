@@ -55,7 +55,7 @@ def dashboard(request):
 
 @require_http_methods(['POST'])
 def reset_cookie_last_slugs(request):
-    response = redirect('home')
+    response = redirect('urlbutcher:home')
     response.delete_cookie('slug_cookies')
     return response
 
@@ -96,7 +96,7 @@ def create_short_slug(request):
         messages.info(request, 'Your link can be used for at least 7 days.')
 
         recent_slugs = update_cookie_last_slugs(request, new_url, new_slug)
-        response = redirect('home')
+        response = redirect('urlbutcher:home')
         response.set_cookie(key='slug_cookies', value=recent_slugs)
 
         return response
@@ -134,7 +134,7 @@ def create_funny_slug(request):
         messages.info(request, f'Your slug: {new_slug}')
 
         recent_slugs = update_cookie_last_slugs(request, new_url, new_slug)
-        response = redirect('home')
+        response = redirect('urlbutcher:home')
         response.set_cookie(key='slug_cookies', value=recent_slugs)
 
         return response
@@ -172,7 +172,7 @@ def create_chuck_norris_slug(request):
         messages.info(request, f'Your slug: {new_slug}')
 
         recent_slugs = update_cookie_last_slugs(request, new_url, new_slug)
-        response = redirect('home')
+        response = redirect('urlbutcher:home')
         response.set_cookie(key='slug_cookies', value=recent_slugs)
 
         return response
@@ -193,7 +193,7 @@ def refresh_slug(request, slug_id):
         slug_obj.created_at = timezone.now()
         slug_obj.save(update_fields=['created_at'])
 
-    return redirect('dashboard')
+    return redirect('urlbutcher:dashboard')
 
 
 @login_required
@@ -208,7 +208,7 @@ def edit_slug(request, slug_id):
             slug_obj.url = form.cleaned_data['url']
             slug_obj.created_at = timezone.now()
             slug_obj.save()
-            return redirect('dashboard')
+            return redirect('urlbutcher:dashboard')
     else:
         form = UrlForm(initial={'slug': slug_obj.slug, 'url': slug_obj.url})
         form.fields['slug'].disabled = True
@@ -227,4 +227,4 @@ def delete_slug(request, slug_id):
     if request.method == 'POST':
         slug_obj.delete()
 
-    return redirect('dashboard')
+    return redirect('urlbutcher:dashboard')

@@ -8,7 +8,7 @@
       {% for slug_item in user_slugs %}
       <li class="list-group-item d-flex flex-wrap justify-content-between align-items-center">
         <a class="text-truncate link-primary" title="{{ slug_item.url }}"
-            href="{% url 'redirect_slug' slug_item.slug %}">
+            href="{% url 'urlbutcher:redirect_slug' slug_item.slug %}">
           {% if slug_item.expired %}
             <s class="link-secondary">{{ slug_item.slug }}</s>
           {% else %}
@@ -21,13 +21,13 @@
             <span class="badge bg-primary rounded-pill">{{ slug_item.counter.click_counter}}</span>
             <sub class="text-black-50">clicks</sub>
           </span>
-          <form class="d-inline-block" action="{% url 'refresh_slug' slug_item.slug %}" method='post'>
+          <form class="d-inline-block" action="{% url 'urlbutcher:refresh_slug' slug_item.slug %}" method='post'>
             {% csrf_token %}
             <button type="submit" class="btn btn-sm bg-secondary" title="refresh expiry date">
               <i class="fa fa-refresh text-white"></i>
             </button>
           </form>
-          <a class="btn btn-sm bg-info text-light" href="{% url 'edit_slug' slug_item.slug %}">
+          <a class="btn btn-sm bg-info text-light" href="{% url 'urlbutcher:edit_slug' slug_item.slug %}">
             Edit
           </a>
           <button class="btn btn-sm bg-danger text-light delete-slug" data-id="{{ slug_item.slug }}">

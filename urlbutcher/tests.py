@@ -33,15 +33,15 @@ class HomePagesTest(SimpleTestCase):
 
 class SlugPagesTest(SimpleTestCase):
     def test_slug_short_page_status_code(self):
-        response = self.client.post(reverse('create_short_slug'))
+        response = self.client.post(reverse('urlbutcher:create_short_slug'))
         self.assertEqual(response.status_code, 200)
 
     def test_slug_funny_page_status_code(self):
-        response = self.client.post(reverse('create_funny_slug'))
+        response = self.client.post(reverse('urlbutcher:create_funny_slug'))
         self.assertEqual(response.status_code, 200)
 
     def test_slug_chuck_page_status_code(self):
-        response = self.client.post(reverse('create_chuck_slug'))
+        response = self.client.post(reverse('urlbutcher:create_chuck_slug'))
         self.assertEqual(response.status_code, 200)
 
 
@@ -80,7 +80,7 @@ class PagesTest(TestCase):
         )
         self.client.login(**self.credentials_userA)
         response = self.client.post(
-            reverse('refresh_slug', kwargs={'slug_id': self.unique_slug})
+            reverse('urlbutcher:refresh_slug', kwargs={'slug_id': self.unique_slug})
         )
         self.assertEqual(response.status_code, 403)
 
@@ -93,7 +93,7 @@ class PagesTest(TestCase):
         )
         self.client.login(**self.credentials_userA)
         response = self.client.post(
-            reverse('refresh_slug', kwargs={'slug_id': self.unique_slug})
+            reverse('urlbutcher:refresh_slug', kwargs={'slug_id': self.unique_slug})
         )
         self.assertEqual(response.status_code, 302)
 
@@ -106,7 +106,7 @@ class PagesTest(TestCase):
         )
         self.client.login(**self.credentials_userA)
         response = self.client.post(
-            reverse('delete_slug', kwargs={'slug_id': self.unique_slug})
+            reverse('urlbutcher:delete_slug', kwargs={'slug_id': self.unique_slug})
         )
         self.assertEqual(response.status_code, 403)
 
@@ -119,7 +119,7 @@ class PagesTest(TestCase):
         )
         self.client.login(**self.credentials_userA)
         response = self.client.post(
-            reverse('delete_slug', kwargs={'slug_id': self.unique_slug})
+            reverse('urlbutcher:delete_slug', kwargs={'slug_id': self.unique_slug})
         )
         self.assertEqual(response.status_code, 302)
 
@@ -132,7 +132,7 @@ class PagesTest(TestCase):
         )
         self.client.login(**self.credentials_userA)
         response = self.client.post(
-            reverse('edit_slug', kwargs={'slug_id': self.unique_slug})
+            reverse('urlbutcher:edit_slug', kwargs={'slug_id': self.unique_slug})
         )
         self.assertEqual(response.status_code, 403)
 
@@ -161,21 +161,21 @@ class ViewsTest(TestCase):
 
     def test_create_short_slug_no_data(self):
         n_entries_before_post = Url.objects.count()
-        response = self.client.post(reverse('create_short_slug'))
+        response = self.client.post(reverse('urlbutcher:create_short_slug'))
         n_entries_after_post = Url.objects.count()
         self.assertEqual(response.status_code, 200)
         self.assertIs(n_entries_before_post, n_entries_after_post)
 
     def test_create_funny_slug_no_data(self):
         n_entries_before_post = Url.objects.count()
-        response = self.client.post(reverse('create_funny_slug'))
+        response = self.client.post(reverse('urlbutcher:create_funny_slug'))
         n_entries_after_post = Url.objects.count()
         self.assertEqual(response.status_code, 200)
         self.assertIs(n_entries_before_post, n_entries_after_post)
 
     def test_create_chuck_slug_no_data(self):
         n_entries_before_post = Url.objects.count()
-        response = self.client.post(reverse('create_chuck_slug'))
+        response = self.client.post(reverse('urlbutcher:create_chuck_slug'))
         n_entries_after_post = Url.objects.count()
         self.assertEqual(response.status_code, 200)
         self.assertIs(n_entries_before_post, n_entries_after_post)
@@ -185,7 +185,7 @@ class ViewsTest(TestCase):
         There is no conflict with slugs already created.
         """
         data = {'slug': self.unique_slug, 'url': self.valid_url}
-        response = self.client.post(reverse('create_short_slug'), data)
+        response = self.client.post(reverse('urlbutcher:create_short_slug'), data)
         self.assertEqual(response.status_code, 302)
         # Retrieve posted object from db:
         posted_slug = Url.objects.get(slug=self.unique_slug)
@@ -197,7 +197,7 @@ class ViewsTest(TestCase):
         it will be overwritten.
         """
         data = {'slug': self.expired_slug, 'url': self.valid_url}
-        response = self.client.post(reverse('create_short_slug'), data)
+        response = self.client.post(reverse('urlbutcher:create_short_slug'), data)
         self.assertEqual(response.status_code, 302)
         # Retrieve posted object:
         posted_slug = Url.objects.get(slug=self.expired_slug)
@@ -209,7 +209,7 @@ class ViewsTest(TestCase):
         """
         data = {'slug': self.recent_slug, 'url': self.valid_url}
         response = self.client.post(
-            reverse('create_short_slug'), data)
+            reverse('urlbutcher:create_short_slug'), data)
         self.assertEqual(response.status_code, 200)
         posted_slug = Url.objects.get(slug=self.recent_slug)
         self.assertEqual(posted_slug.created_at, self.recent_date)
@@ -221,7 +221,7 @@ class ViewsTest(TestCase):
         n_entries_before_post = Url.objects.count()
         data = {'slug': 'ignored_slug', 'url': self.valid_url}
         response = self.client.post(
-            reverse('create_funny_slug'), data)
+            reverse('urlbutcher:create_funny_slug'), data)
         n_entries_after_post = Url.objects.count()
         self.assertEqual(response.status_code, 302)
         self.assertIs(n_entries_before_post+1, n_entries_after_post)
@@ -233,7 +233,7 @@ class ViewsTest(TestCase):
         n_entries_before_post = Url.objects.count()
         data = {'slug': 'invalid._._;,slug', 'url': self.valid_url}
         response = self.client.post(
-            reverse('create_funny_slug'), data)
+            reverse('urlbutcher:create_funny_slug'), data)
         n_entries_after_post = Url.objects.count()
         self.assertEqual(response.status_code, 302)
         self.assertIs(n_entries_before_post+1, n_entries_after_post)
@@ -245,7 +245,7 @@ class ViewsTest(TestCase):
         n_entries_before_post = Url.objects.count()
         data = {'slug': 'valid_slug', 'url': self.valid_url}
         response = self.client.post(
-            reverse('create_chuck_slug'), data)
+            reverse('urlbutcher:create_chuck_slug'), data)
         n_entries_after_post = Url.objects.count()
         self.assertEqual(response.status_code, 302)
         self.assertIs(n_entries_before_post+1, n_entries_after_post)
@@ -256,7 +256,7 @@ class ViewsTest(TestCase):
         """
         n_entries_before_post = Url.objects.count()
         data = {'slug': 'invalid._._;,slug', 'url': self.valid_url}
-        response = self.client.post(reverse('create_chuck_slug'), data)
+        response = self.client.post(reverse('urlbutcher:create_chuck_slug'), data)
         n_entries_after_post = Url.objects.count()
         self.assertEqual(response.status_code, 302)
         self.assertIs(n_entries_before_post+1, n_entries_after_post)
@@ -269,7 +269,7 @@ class ViewsTest(TestCase):
             Url, slug='new_slug', url=self.valid_url, user=self.auth_user
         )
         response = self.client.get(
-            reverse('redirect_slug', kwargs={'slug_id': 'new_slug'})
+            reverse('urlbutcher:redirect_slug', kwargs={'slug_id': 'new_slug'})
         )
         count_obj = SlugClickCounter.objects.get(slug=slug_obj)
         self.assertEqual(slug_obj, count_obj.slug)
@@ -284,7 +284,9 @@ class ViewsTest(TestCase):
         self.assertTrue(corresponding_click_counter.exists())
 
         self.client.login(**self.credentials_auth_user)
-        self.client.post(reverse('delete_slug', kwargs={'slug_id': slug_obj.slug}))
+        self.client.post(
+            reverse('urlbutcher:delete_slug', kwargs={'slug_id': slug_obj.slug})
+        )
 
         slug = Url.objects.filter(pk=self.unique_slug)
         self.assertFalse(slug.exists())
@@ -297,7 +299,7 @@ class ViewsTest(TestCase):
             Url, slug=self.unique_slug, url=self.valid_url, user=self.auth_user
         )
         response = self.client.get(
-            reverse(f'edit_slug', kwargs={'slug_id': self.unique_slug})
+            reverse('urlbutcher:edit_slug', kwargs={'slug_id': self.unique_slug})
         )
         disabled_slug_field = response.context['form'].fields['slug'].disabled
         self.assertTrue(disabled_slug_field)
@@ -306,7 +308,7 @@ class ViewsTest(TestCase):
         # new_url = 'http://www.new_url.pl'
         # response.context['form'].fields['url'] = new_url
         # response = self.client.post(
-        #     reverse('edit_slug', kwargs={'slug_id': slug_to_change.slug})
+        #     reverse('urlbutcher:edit_slug', kwargs={'slug_id': slug_to_change.slug})
         # )
         # # slug_to_change.refresh_from_db()
         # self.assertEqual(slug_to_change.url, new_url)
