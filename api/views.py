@@ -10,4 +10,8 @@ from urlbutcher.models import Url
 class SlugList(generics.ListCreateAPIView):
     queryset = Url.objects.all()
     serializer_class = SlugSerializer
-    pass
+
+
+class SlugDetail(generics.RetrieveDestroyAPIView):
+    queryset = Url.objects.all()
+    serializer_class = SlugSerializer

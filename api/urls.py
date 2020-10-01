@@ -7,7 +7,8 @@ from . import views
 app_name = 'api'
 
 urlpatterns = [
-    path('', views.SlugList.as_view(), name='slug_list')
+    path('', views.SlugList.as_view(), name='slug_list'),
+    path('<slug:pk>/', views.SlugDetail.as_view(), name='slug_detail'),
 ]
 
 
