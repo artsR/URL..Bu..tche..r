@@ -14,6 +14,4 @@ INSTALLED_APPS += [
     'api',
 ]
 
-# STATIC_ROOT = 'static/'
-
 #DEBUG_COLLECTSTATIC = 1
