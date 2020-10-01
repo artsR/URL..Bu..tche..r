@@ -7,3 +7,9 @@ from .defaults import *
 # RECAPTCHA_TESTING = True
 # NOCAPTCHA = False
 # SILENCED_SYSTEM_CHECKS = ['captcha.recaptcha_test_key_error']
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ]
+}
