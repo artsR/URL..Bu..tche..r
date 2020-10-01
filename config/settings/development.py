@@ -9,4 +9,11 @@ DEBUG=True
 
 ALLOWED_HOSTS += ['127.0.0.1']
 
+INSTALLED_APPS += [
+    'rest_framework',
+    'api',
+]
+
+# STATIC_ROOT = 'static/'
+
 #DEBUG_COLLECTSTATIC = 1

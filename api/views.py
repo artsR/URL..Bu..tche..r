@@ -1,3 +1,13 @@
+from rest_framework import generics
+
 from django.shortcuts import render
 
-# Create your views here.
+from .serializers import SlugSerializer
+from urlbutcher.models import Url
+
+
+
+class SlugList(generics.ListCreateAPIView):
+    queryset = Url.objects.all()
+    serializer_class = SlugSerializer
+    pass
