@@ -7,7 +7,7 @@
     <ul class="list-group mt-3">
       {% for slug_item in user_slugs %}
       <li class="list-group-item d-flex flex-wrap justify-content-between align-items-center">
-        <a class="text-truncate link-primary" title="{{ slug_item.url }}"
+        <a class="text-truncate link-primary" title="{{ slug_item.url }}" target="_blank"
             href="{% url 'urlbutcher:redirect_slug' slug_item.slug %}">
           {% if slug_item.expired %}
             <s class="link-secondary">{{ slug_item.slug }}</s>
