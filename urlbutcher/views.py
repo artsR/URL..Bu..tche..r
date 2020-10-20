@@ -191,6 +191,7 @@ def refresh_slug(request, slug_id):
 
     if request.method == 'POST':
         slug_obj.created_at = timezone.now()
+        # Let to know signals to not reset counter:
         slug_obj.save(update_fields=['created_at'])
 
     return redirect('urlbutcher:dashboard')
