@@ -20,6 +20,9 @@ class SlugList(generics.ListCreateAPIView):
         current_user = self.request.user
         return current_user.url_set.all()
 
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
 
 class SlugDetail(generics.RetrieveDestroyAPIView, SlugUserPermission):
     permission_classes = [SlugUserPermission, IsAuthenticated]
