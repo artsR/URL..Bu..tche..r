@@ -1,9 +1,12 @@
-from dotenv import load_dotenv
+import os
 
-from .defaults import *
+from dotenv import load_dotenv
 
 ENV_DIR = os.path.abspath(os.path.dirname(__file__))
 load_dotenv(os.path.join(ENV_DIR, '.env'))
+
+from .defaults import *
+
 
 DEBUG=True
 
