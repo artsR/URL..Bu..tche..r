@@ -14,6 +14,8 @@ class APISlugTest(APITestCase):
         self.credentials_auth_user = {'username': 'test', 'password': 'Test123'}
         self.auth_user = User.objects.create(**self.credentials_auth_user)
 
+        self.valid_url = 'http://www.example.pl'
+
     def test_slug_list_as_anonymous(self):
         """List of slugs can be accessed only by authenticated users.
         Anonymous users should obtain 403 as response.
