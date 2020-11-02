@@ -7,8 +7,9 @@ from django.contrib.auth.models import User
 from django.shortcuts import render
 from rest_framework.permissions import IsAuthenticated
 
-from .permissions import SlugUserPermission
-from .serializers import SlugSerializer
+from .models import SlugType
+from .permissions import SlugUserPermission, IsAdminUserOrReadOnly
+from .serializers import SlugSerializer, SlugTypeSerializer
 from urlbutcher.models import Url
 
 
@@ -21,7 +22,7 @@ def api_root(request):
 
 
 class SlugList(generics.ListCreateAPIView):
-    permission_classes = [SlugUserPermission, IsAuthenticated]
+    permission_classes = [IsAuthenticated, SlugUserPermission]
     serializer_class = SlugSerializer
 
     def get_queryset(self):
@@ -32,7 +33,7 @@ class SlugList(generics.ListCreateAPIView):
         serializer.save(user=self.request.user)
 
 
-class SlugDetail(generics.RetrieveDestroyAPIView, SlugUserPermission):
-    permission_classes = [SlugUserPermission, IsAuthenticated]
+class SlugDetail(generics.RetrieveUpdateDestroyAPIView, SlugUserPermission):
+    permission_classes = [IsAuthenticated, SlugUserPermission]
     queryset = Url.objects.all()
     serializer_class = SlugSerializer
