@@ -1,15 +1,15 @@
 from rest_framework import generics
 from rest_framework.decorators import api_view
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 
 from django.contrib.auth.models import User
 from django.shortcuts import render
-from rest_framework.permissions import IsAuthenticated
+from django.utils import timezone
 
-from .models import SlugType
 from .permissions import SlugUserPermission, IsAdminUserOrReadOnly
-from .serializers import SlugSerializer, SlugTypeSerializer
+from .serializers import SlugSerializer
 from urlbutcher.models import Url
 
 
@@ -37,3 +37,11 @@ class SlugDetail(generics.RetrieveUpdateDestroyAPIView, SlugUserPermission):
     permission_classes = [IsAuthenticated, SlugUserPermission]
     queryset = Url.objects.all()
     serializer_class = SlugSerializer
+
+    def partial_update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.created_at = timezone.now()
+        # Save and Let to know signals to not reset click counter:
+        instance.save(update_fields=['created_at'])
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)

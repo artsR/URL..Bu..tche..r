@@ -21,7 +21,7 @@ INSTALLED_APPS += [
 
 # Token Authenticaton
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=10),
 
     'ALGORITHM': 'HS256',
