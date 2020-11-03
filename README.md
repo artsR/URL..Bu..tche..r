@@ -19,7 +19,7 @@ To use API you are required to have account. After sign up you can get token tha
 API allows CRUD operation on slugs + PATCH for prolongating expire date.
 
 #### Documentation
-Documentation can be found under `docs/` - generating automatically using `coreapi`
+Documentation can be found under `docs/` - generated automatically using `coreapi`
 
 #### Schema
-Schema can be found under `schema` - generating automatically using `pyyaml` and `uritemplate`
+Schema can be found under `schema` - generated automatically using `pyyaml` and `uritemplate`
