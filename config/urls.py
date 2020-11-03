@@ -17,7 +17,18 @@ from django.urls import path, include
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 
+from rest_framework.documentation import include_docs_urls
+from rest_framework.schemas import get_schema_view
+
 urlpatterns = [
+    path('schema', get_schema_view(
+        title='UrlButcherAPI',
+        description='API for the urlbutcher'
+        ),
+        name='openapi-schema'
+    ),
+    path('docs/', include_docs_urls(title='UrlButcherAPI')),
+    
     path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls')),
     path('accounts/login/', auth_views.LoginView.as_view(redirect_authenticated_user=True)),

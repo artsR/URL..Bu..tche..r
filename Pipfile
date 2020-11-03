@@ -19,6 +19,9 @@ whitenoise = "*"
 gunicorn = "*"
 djangorestframework = "*"
 djangorestframework-simplejwt = "*"
+pyyaml = "*"
+uritemplate = "*"
+coreapi = "*"
 
 [requires]
 python_version = "3.8"

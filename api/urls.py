@@ -14,12 +14,4 @@ urlpatterns = [
     path('token/refresh', TokenRefreshView.as_view(), name='token_refresh'),
     path('slugs/', views.SlugList.as_view(), name='slug_list'),
     path('slugs/<slug:pk>/', views.SlugDetail.as_view(), name='slug_detail'),
-    # path('slugs/types', views.SlugTypes, name='slug_types'),
 ]
-
-
-
-# make in api.models with inherting imported Url model
-# class UrlManager (models.Manager):
-#     def get_queryset(self):
-#         return super().get_queryset().filter(user_token=self.token)

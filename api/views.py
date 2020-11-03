@@ -39,6 +39,7 @@ class SlugDetail(generics.RetrieveUpdateDestroyAPIView, SlugUserPermission):
     serializer_class = SlugSerializer
 
     def partial_update(self, request, *args, **kwargs):
+        """Prolongates expire data for slug."""
         instance = self.get_object()
         instance.created_at = timezone.now()
         # Save and Let to know signals to not reset click counter:
