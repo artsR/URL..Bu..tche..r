@@ -60,6 +60,17 @@ def reset_cookie_last_slugs(request):
     return response
 
 
+"""from django.views.generic.base import RedirectView
+class RedirectSlug(RedirectView):
+    def get_redirect_url(self, *args, **kwargs):
+        website = get_object_or_404(Url, pk=slug_id)
+
+        slug_to_redirect = SlugClickCounter.objects.filter(pk=website).first()
+        if slug_to_redirect is not None:
+            slug_to_redirect.click_counter = F('click_counter') + 1
+            slug_to_redirect.save()
+        return super().get_redirect_url(url=website.url)
+
 @require_http_methods(['GET'])
 def redirect_slug(request, slug_id):
     website = get_object_or_404(Url, pk=slug_id)
