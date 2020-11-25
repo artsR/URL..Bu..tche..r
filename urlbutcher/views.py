@@ -70,7 +70,7 @@ class RedirectSlug(RedirectView):
             slug_to_redirect.click_counter = F('click_counter') + 1
             slug_to_redirect.save()
         return super().get_redirect_url(url=website.url)
-
+"""
 @require_http_methods(['GET'])
 def redirect_slug(request, slug_id):
     website = get_object_or_404(Url, pk=slug_id)
